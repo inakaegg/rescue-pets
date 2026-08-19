@@ -1,5 +1,5 @@
 # 各 PoC は独立した Git リポジトリ。このリポジトリはコンセプトと仕様だけを追跡する
-/2-item-manager/
+/rescue-pets/
 
 # 内部メモと一時ファイル（AGENTS.md の規則）
 _ai/
