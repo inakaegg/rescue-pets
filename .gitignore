@@ -1,6 +1,12 @@
-# 各 PoC は独立した Git リポジトリ。このリポジトリはコンセプトと仕様だけを追跡する
-/rescue-pets/
-
 # 内部メモと一時ファイル（AGENTS.md の規則）
 _ai/
 tmp/
+node_modules
+
+# ビルドと Amplify のローカル生成物
+dist
+*.log
+.DS_Store
+.amplify
+amplify_outputs*
+amplifyconfiguration*
