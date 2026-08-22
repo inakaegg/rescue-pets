@@ -8,15 +8,15 @@
 
 ## 構成
 
-![目標構成。ブラウザと CLI から API Gateway・Lambda（Hono）を経て DynamoDB と Bedrock へ届く](docs/diagrams/architecture.png)
+<a href="docs/diagrams/architecture.png"><img src="docs/diagrams/architecture.png" alt="目標構成。ブラウザと CLI から API Gateway・Lambda（Hono）を経て DynamoDB と Bedrock へ届く" width="100%"></a>
 
 番号は実装の順序です。緑の矢印だけが課金される LLM 呼び出しで、破線の群は初版に含めません。
 
-![動かす経路。A は npx ampx sandbox で個人用スタックを作る開発経路、B は git push から Amplify アプリで公開する経路](docs/diagrams/deploy-paths.png)
+<a href="docs/diagrams/deploy-paths.png"><img src="docs/diagrams/deploy-paths.png" alt="動かす経路。A は npx ampx sandbox で個人用スタックを作る開発経路、B は git push から Amplify アプリで公開する経路" width="100%"></a>
 
 A（`npx ampx sandbox`）は実際の AWS アカウント上に開発者ごとのスタックを作り、`amplify_outputs.json` を手元のフロントと CLI が読みます。B（git push → Amplify アプリ）は公開の経路で、push が前提です。
 
-図は `docs/diagrams/architecture.py` から生成します（コマンドは下の表）。PNG は直接編集しません。
+図はクリックすると原寸で開きます。`docs/diagrams/architecture.py` から生成します（コマンドは下の表）。PNG は直接編集しません。
 
 ## 技術構成（目標。現状は雛形）
 
