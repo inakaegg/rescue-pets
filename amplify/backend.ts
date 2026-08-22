@@ -5,7 +5,7 @@ import { auth } from './auth/resource'
 import { apiFunction } from './functions/api/resource'
 
 // Amplify Data（AppSync/DynamoDB）は仕様により使わない。
-// データ層は PostgreSQL + REST（SPEC.md 参照）。
+// データ層は DynamoDB 1テーブル + REST（SPEC.md 参照）。テーブルは SPEC「実装の順序」2 で追加する。
 const backend = defineBackend({
   auth,
   apiFunction,
