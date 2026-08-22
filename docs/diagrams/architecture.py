@@ -29,15 +29,16 @@ except ImportError:
 
 HERE = Path(__file__).resolve().parent  # 出力先をスクリプトの場所に固定する
 FONT = "Hiragino Sans"
-GRAPH = {"fontname": FONT, "fontsize": "13", "pad": "0.4", "nodesep": "0.5", "ranksep": "0.9", "splines": "spline"}
-NODE = {"fontname": FONT, "fontsize": "11"}
+GRAPH = {"fontname": FONT, "fontsize": "12", "pad": "0.3", "nodesep": "0.4", "ranksep": "0.7", "splines": "spline"}
+# 既定（幅 1.4 / 高さ 1.9 インチ）はアイコンが大きすぎるので縮める
+NODE = {"fontname": FONT, "fontsize": "10", "width": "0.9", "height": "1.25"}
 EDGE = {"fontname": FONT, "fontsize": "10"}
 LATER = {"style": "dashed", "color": "#8E9A94", "fontcolor": "#8E9A94"}
 
 with Diagram(
     "rescue-pets 目標構成（番号は実装の順序）",
     filename=str(HERE / "architecture"), outformat="png", show=False, direction="TB",
-    graph_attr={**GRAPH, "ranksep": "1.1", "nodesep": "0.7"}, node_attr=NODE, edge_attr=EDGE,
+    graph_attr={**GRAPH, "ranksep": "0.9", "nodesep": "0.5"}, node_attr=NODE, edge_attr=EDGE,
 ):
     with Cluster("手元（AWS の外）"):
         user = Users("利用者\nブラウザ")
