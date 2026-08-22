@@ -1,13 +1,16 @@
 """rescue-pets 構成図（AWS 公式アイコン）。mingrammer/diagrams で生成する。
 実行: uv run --with diagrams python docs/diagrams/architecture.py（要 Graphviz。どのディレクトリから実行してもよい）
-出力は同じディレクトリの architecture.png / deploy-paths.png。図を変えるときはこのファイルを直して再生成し、PNG を手で編集しない。
+出力は同じディレクトリの architecture.svg / deploy-paths.svg。図を変えるときはこのファイルを直して再生成し、SVG を手で編集しない。
+SVG にしているのは、GitHub 上でブラウザのズーム（⌘+）をかけても文字がぼやけないようにするため。
 
 ノードは diagrams の既定（アイコンと文字が同じ固定サイズの箱）を使わず、Graphviz の HTML ラベルに
 <IMG> を埋め込む。アイコンの大きさ（ICON_PX）と文字の大きさ（TITLE_PT / SUB_PT）を独立に決められ、
 ノード幅は文字に合わせて自動で決まるため、文字を大きくしても隣と重ならない。
 """
 
+import base64
 import html
+import re
 from pathlib import Path
 
 import diagrams
@@ -51,6 +54,8 @@ EDGE = {"fontname": FONT, "fontsize": "13"}
 CLUSTER = {"fontname": FONT, "fontsize": "15"}
 LATER_CLUSTER = {**CLUSTER, "style": "dashed", "color": LATER_COLOR, "fontcolor": LATER_COLOR}
 LATER_EDGE = {"style": "dashed", "color": LATER_COLOR, "fontcolor": LATER_COLOR}
+# SVG の文字は閲覧側のフォントで描かれるので、Mac 以外でも日本語が出る候補を並べる
+FONT_STACK = "Hiragino Sans, Noto Sans JP, Yu Gothic UI, Meiryo, sans-serif"
 
 
 def svc(cls, title, *sub, color="#1C2420", sub_color=SUB_COLOR):
@@ -69,10 +74,25 @@ def later(cls, title, *sub):
     return svc(cls, title, *sub, color=LATER_COLOR, sub_color=LATER_COLOR)
 
 
+def finalize_svg(path: Path) -> None:
+    """Graphviz の SVG はアイコンをローカルパスで参照するので、base64 で埋め込んで単体で表示できる形にする。"""
+    svg = path.read_text()
+
+    def embed(m):
+        icon = Path(m.group(1))
+        data = base64.b64encode(icon.read_bytes()).decode()
+        return f'xlink:href="data:image/png;base64,{data}"'
+
+    svg = re.sub(r'xlink:href="(/[^"]+\.png)"', embed, svg)
+    svg = svg.replace(f'font-family="{FONT}"', f'font-family="{FONT_STACK}"')
+    svg = svg.replace('font-family="Sans-Serif"', f'font-family="{FONT_STACK}"')  # diagrams が図のタイトルに付ける既定
+    path.write_text(svg)
+
+
 with Diagram(
     "rescue-pets 目標構成（番号は実装の順序）",
     filename=str(HERE / "architecture"),
-    outformat="png",
+    outformat="svg",
     show=False,
     direction="TB",
     graph_attr={**GRAPH, "ranksep": "0.8"},
@@ -118,11 +138,13 @@ with Diagram(
     bedrock >> Edge(style="invis") >> crawler
     bedrock >> Edge(style="invis") >> line
 
+finalize_svg(HERE / "architecture.svg")
+
 
 with Diagram(
     "動かす経路 — A: sandbox（開発・検証）  B: 公開（push が前提）",
     filename=str(HERE / "deploy-paths"),
-    outformat="png",
+    outformat="svg",
     show=False,
     direction="LR",
     graph_attr=GRAPH,
@@ -157,3 +179,5 @@ with Diagram(
     app >> Edge(label="フロントをビルド") >> host
     app >> Edge(label="バックエンドを deploy") >> b_stack
     host >> Edge(label="API を呼ぶ") >> b_stack
+
+finalize_svg(HERE / "deploy-paths.svg")
