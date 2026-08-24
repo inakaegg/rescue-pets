@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:api": "tsx amplify/functions/api/local.ts",
+    "test:pet-assets": "node --test scripts/pet-assets.test.mjs",
     "typecheck:backend": "tsc --noEmit -p amplify/tsconfig.json",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
