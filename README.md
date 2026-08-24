@@ -1,6 +1,6 @@
 # rescue-pets — 保護犬猫ポータル
 
-更新日: 2026-08-22
+更新日: 2026-08-24
 
 全国の保護犬猫の譲渡情報を1か所で検索できるようにする Web サービスの PoC です。掲載データはすべて架空です。仕様は [SPEC.md](SPEC.md) にあります。
 
@@ -25,7 +25,7 @@ A（`npx ampx sandbox`）は実際の AWS アカウント上に開発者ごと�
 - インフラ: AWS Amplify Gen2 + AWS CDK（Amplify Data は使いません）
 - データベース: Amazon DynamoDB の1テーブル（自動テストだけメモリ内ストア）
 - AI: Amazon Bedrock 上の GPT-5.6 Luna（自動テストは実応答を記録して再生します）
-- CLI（未実装）: `pets seed` / `pets search`。Lambda と同じロジックで sandbox のテーブルを読み書きします
+- CLI（未実装）: `pets structure`（紹介文を LLM で構造化して固定）と `pets seed`（sandbox のテーブルへ投入）。検索は CLI を作らず、ローカル API への curl で確かめます
 
 AWS 以外の外部サービスは使いません。
 
