@@ -8,6 +8,7 @@
 | ビルド | `npm run build` |
 | ビルド結果のプレビュー | `npm run preview` |
 | lint | `npm run lint` |
+| 掲載写真の検査 | `npm run test:pet-assets` |
 | バックエンドの型検査 | `npm run typecheck:backend` |
 | AWSサンドボックス起動 | `npx ampx sandbox` |
 | 構成図の再生成 | `uv run --with diagrams python docs/diagrams/architecture.py` |
