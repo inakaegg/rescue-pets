@@ -4,8 +4,8 @@ import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations
 import { auth } from './auth/resource'
 import { apiFunction } from './functions/api/resource'
 
-// Amplify Data（AppSync/DynamoDB）は仕様により使わない。
-// データ層は DynamoDB 1テーブル + REST（SPEC.md 参照）。テーブルは SPEC「実装の順序」2 で追加する。
+// Amplify Data（AppSync/DynamoDB）は使わない（docs/decisions/004 参照）。
+// データ層は DynamoDB 1テーブル + REST（docs/data.md 参照）。テーブルは docs/ROADMAP.md の順序2で追加する。
 const backend = defineBackend({
   auth,
   apiFunction,

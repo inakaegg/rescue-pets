@@ -8,11 +8,14 @@ import { fileURLToPath } from 'node:url'
 
 const repositoryRoot = fileURLToPath(new URL('..', import.meta.url))
 const photoDirectory = path.join(repositoryRoot, 'public', 'pets')
-const expectedCount = 6
+// 素材リポジトリ pets-image が生成した現物と同じであることを固定する。寸法と容量だけの検査では、
+// 同じ体裁で再エンコードした別物へ差し替えられても気づけない。
+const digestFile = path.join(repositoryRoot, 'scripts', 'pet-photos.sha256')
+const expectedCount = 50
 const maxBytes = 250 * 1024
 
 // 途中で切れたファイルでも先頭のヘッダーだけは読めてしまう。RIFF の申告長と各チャンクの収まりも確かめて、
-// 壊れた画像が「512×512 の WebP」として通り抜けるのを防ぐ。
+// 壊れた画像が「1024×1024 の WebP」として通り抜けるのを防ぐ。
 function readWebpDimensions(buffer) {
   assert.equal(buffer.subarray(0, 4).toString(), 'RIFF')
   assert.equal(buffer.subarray(8, 12).toString(), 'WEBP')
@@ -48,24 +51,42 @@ async function photoFiles() {
   return (await readdir(photoDirectory)).filter((file) => file.endsWith('.webp')).sort()
 }
 
-test('public/pets holds the six anchor photos', async () => {
+test('public/pets holds the fifty sample photos', async () => {
   const files = await photoFiles()
   assert.equal(files.length, expectedCount)
-  for (const file of files) assert.match(file, /^anchor-[a-z]+\.webp$/)
+  for (const file of files) assert.match(file, /^sample-[a-z]+\.webp$/)
 })
 
-test('every photo is a complete 512px WebP, bounded in size, and unique', async () => {
+test('every photo is a complete 1024px WebP, bounded in size, and unique', async () => {
   const hashes = new Set()
   for (const file of await photoFiles()) {
     const photo = await readFile(path.join(photoDirectory, file))
     assert.ok(photo.length <= maxBytes, `${file} is ${photo.length} bytes`)
-    assert.deepEqual(readWebpDimensions(photo), { width: 512, height: 512 })
+    assert.deepEqual(readWebpDimensions(photo), { width: 1024, height: 1024 })
     hashes.add(createHash('sha256').update(photo).digest('hex'))
   }
   assert.equal(hashes.size, expectedCount)
 })
 
-test('a truncated photo is rejected instead of read as 512px', async () => {
+test('every photo matches the digest recorded for the source material', async () => {
+  const expected = new Map(
+    (await readFile(digestFile, 'utf8'))
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        const [hash, file] = line.split(/\s+/)
+        return [file, hash]
+      }),
+  )
+  const files = await photoFiles()
+  assert.deepEqual(files, [...expected.keys()].sort())
+  for (const file of files) {
+    const photo = await readFile(path.join(photoDirectory, file))
+    assert.equal(createHash('sha256').update(photo).digest('hex'), expected.get(file), file)
+  }
+})
+
+test('a truncated photo is rejected instead of read as 1024px', async () => {
   const [first] = await photoFiles()
   const photo = await readFile(path.join(photoDirectory, first))
   assert.throws(() => readWebpDimensions(photo.subarray(0, 30)))
