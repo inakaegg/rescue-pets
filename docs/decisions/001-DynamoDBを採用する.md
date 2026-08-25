@@ -12,6 +12,8 @@
 
 当初はPostgreSQLの全文検索と `pg_trgm` のあいまい一致で候補を絞る設計だった。その後、絞り込みを自前の文字3-gramで行う方針に変わり（[search.md](../search.md)）、データベース側の検索機能が不要になった。検索機能が要らなければ、リレーショナルDBを選ぶ理由も薄れる。
 
+なお、DynamoDBを選んでも [004](004-Amplify-Dataを使わない.md) を覆すことにはならない。Amplify Dataは「AppSync（GraphQL）+ スキーマから自動生成されるDynamoDB」のセットであり、本判断ではDynamoDBのテーブルと権限を自前のCDKで定義し、APIはRESTのまま保つ。共通するのはDynamoDBという部品だけである。
+
 ## 検討した代替案
 
 | 案 | 無料枠 | 不採用の理由 |
