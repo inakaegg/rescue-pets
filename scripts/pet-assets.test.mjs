@@ -11,6 +11,8 @@ const photoDirectory = path.join(repositoryRoot, 'public', 'pets')
 // 素材リポジトリ pets-image が生成した現物と同じであることを固定する。寸法と容量だけの検査では、
 // 同じ体裁で再エンコードした別物へ差し替えられても気づけない。
 const digestFile = path.join(repositoryRoot, 'scripts', 'pet-photos.sha256')
+// 紹介文は写真と対で1件の掲載になる。片方だけ差し替えると、写真と本文が食い違ったまま掲載される。
+const listingFile = path.join(repositoryRoot, 'data', 'sample-pets.json')
 const expectedCount = 50
 const maxBytes = 250 * 1024
 
@@ -91,4 +93,29 @@ test('a truncated photo is rejected instead of read as 1024px', async () => {
   const photo = await readFile(path.join(photoDirectory, first))
   assert.throws(() => readWebpDimensions(photo.subarray(0, 30)))
   assert.throws(() => readWebpDimensions(photo.subarray(0, photo.length - 1)))
+})
+
+test('the blurb file pairs one-to-one with the photos', async () => {
+  const listings = JSON.parse(await readFile(listingFile, 'utf8'))
+  assert.equal(listings.pets.length, expectedCount)
+
+  const files = await photoFiles()
+  assert.deepEqual(
+    listings.pets.map((pet) => `${pet.id}.webp`).sort(),
+    files,
+    '紹介文と写真の id が1対1で対応していない',
+  )
+})
+
+test('every listing carries the fields the portal displays', async () => {
+  const listings = JSON.parse(await readFile(listingFile, 'utf8'))
+  for (const pet of listings.pets) {
+    assert.match(pet.id, /^sample-[a-z]+$/, `id の形式が違う: ${pet.id}`)
+    assert.ok(pet.name?.trim(), `呼び名が空: ${pet.id}`)
+    assert.ok(['dog', 'cat'].includes(pet.species), `species が dog/cat でない: ${pet.id}`)
+    // 配信元の写真は public/ 直下から配るので、URL は必ずこの形になる。
+    assert.equal(pet.photoUrl, `/pets/${pet.id}.webp`, `photoUrl が id と食い違う: ${pet.id}`)
+    // 紹介文は検索の AI が種別・年齢・相性を読み取る唯一の材料である。短すぎれば構造化が空になる。
+    assert.ok(pet.description?.length > 50, `紹介文が無いか短すぎる: ${pet.id}`)
+  }
 })
