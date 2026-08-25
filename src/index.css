@@ -1,8 +1,16 @@
 :root {
   font-family: system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
   color-scheme: light dark;
-  color: light-dark(#213547, rgba(255, 255, 255, 0.87));
-  background-color: light-dark(#ffffff, #242424);
+
+  --surface: light-dark(#fdfaf5, #2b2724);
+  --text: light-dark(#3f362e, #ece4da);
+  --muted: light-dark(#8a7d70, #a99c8e);
+  --accent: light-dark(#b05f3c, #e0956f);
+  --note-bg: light-dark(#f1e5d4, #3a332c);
+  --note-fg: light-dark(#6f5b43, #d4c4ae);
+
+  color: var(--text);
+  background-color: var(--surface);
 }
 
 body {
